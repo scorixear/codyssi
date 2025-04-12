@@ -70,8 +70,16 @@ class Action:
                     grid[i][self.index] = new_col[i]
 
 class Control:
-    def __init__(self, line: str):
-        pass          
+    def __init__(self):
+        self.current = None
+    def perform_control(self, control: str, grid: list[list[int]], instructions: list[Action]):
+        if control == "TAKE":
+            self.current = instructions.pop(0)
+        elif control == "CYCLE":
+            instructions.append(self.current)
+        elif control == "ACT":
+            self.current.perform(grid)
+              
                     
 
 def main():
@@ -80,7 +88,7 @@ def main():
         lines = text.split("\n")
     grid: list[list[int]] = []
     instructions: list[Action] = []
-    controls: list[Control] = []
+    control = Control()
     mode = 0
     for line in lines:
         if mode == 0 and line == "":
@@ -94,9 +102,7 @@ def main():
         elif mode == 1:
             instructions.append(Action(line))
         elif mode == 2:
-            controls.append(Control(line))
-    for instruction in instructions:
-        instruction.perform(grid)
+            control.perform_control(line, grid, instructions)
     total = 0
     for i in range(len(grid)):
         total = max(total, sum(grid[i]))
