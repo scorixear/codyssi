@@ -7,9 +7,17 @@ def main():
         lines = text.split("\n")
     total = 0
     for line in lines:
-        for char in line:
-            if char.isalpha():
-                total += 1
+        i = 0
+        while i < len(line) - 1:
+            left = line[i]
+            right = line[i+1]
+            if (left.isnumeric() and not right.isnumeric()) or (not left.isnumeric() and right.isnumeric()):
+                line = line[:i] + line[i+2:]
+                i = 0
+            else:
+                i += 1
+        total += len(line)
+            
     print(total)
 
 if __name__ == "__main__":
