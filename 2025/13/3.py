@@ -1,14 +1,12 @@
 import os, sys
 import time
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-from algorithms import dijkstra
 
 class Node:
     def __init__(self, identifier: str):
         self.id = identifier
         self.neighbours: dict["Node", int] = {}
     def add_neighbour(self, neighbour, cost):
-        self.neighbours[neighbour] =  1
+        self.neighbours[neighbour] =  cost
     def get_neighbours(self):
         return self.neighbours.keys()
     def get_cost(self, neighbour):
@@ -25,7 +23,27 @@ class Node:
         return self.id == other.id
     def __lt__(self, other):
         return self.id < other.id
-    
+class Dfs:
+    def __init__(self):
+        self.max_cycle_weight = 0
+    def find(self, nodes):
+        for node in nodes.values():
+            self._dfs(node, [], set())
+        return self.max_cycle_weight
+    def _dfs(self, node, path, visited):
+        for neighbour in node.get_neighbours():
+            weight = node.get_cost(neighbour)
+            edge = (node, neighbour, weight)
+            cycle_start_indices = [i for i, e in enumerate(path) if e[0] == neighbour]
+            if cycle_start_indices:
+                i = cycle_start_indices[0]
+                cycle_weight = sum(e[2] for e in path[i:]) + weight
+                self.max_cycle_weight = max(self.max_cycle_weight, cycle_weight)
+            elif neighbour not in visited:
+                new_path = path + [edge]
+                new_visited = visited.copy()
+                new_visited.add(node)
+                self._dfs(neighbour, new_path, new_visited)
 
 def main():
     with open(os.path.join(sys.path[0],"input.txt"), "r", encoding="utf-8") as f:
@@ -40,17 +58,10 @@ def main():
         if b not in nodes:
             nodes[b] = Node(b)
         nodes[a].add_neighbour(nodes[b], l)
-    algo: dijkstra.Dijkstra[Node, int] = dijkstra.Dijkstra(lambda node: node.get_neighbours(), lambda node_a, node_b: node_a.get_cost(node_b), 0)
+    dfs = Dfs()
+    result = dfs.find(nodes)
     
-    start = nodes["STT"]
-    algo.find_path(start, Node("END"))
-    all_costs = [algo.get_cost(node) for node in nodes.values()]
-    all_costs.sort()
-    product = 1
-    for i in range(len(all_costs) - 3, len(all_costs)):
-        product *= all_costs[i]
-    print(product)
-
+    print(result)
 if __name__ == "__main__":
     before = time.perf_counter()
     main()

@@ -8,7 +8,7 @@ class Node:
         self.id = identifier
         self.neighbours: dict["Node", int] = {}
     def add_neighbour(self, neighbour, cost):
-        self.neighbours[neighbour] =  1
+        self.neighbours[neighbour] =  cost
     def get_neighbours(self):
         return self.neighbours.keys()
     def get_cost(self, neighbour):
