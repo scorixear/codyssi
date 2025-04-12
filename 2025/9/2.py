@@ -21,6 +21,8 @@ def main():
                 balances[source] = 0
             if destination not in balances:
                 balances[destination] = 0
+            if amount > balances[source]:
+                amount = balances[source]
             balances[source] -= amount
             balances[destination] += amount
     balance_values = list(balances.values())
