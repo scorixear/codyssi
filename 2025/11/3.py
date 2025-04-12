@@ -22,8 +22,13 @@ def main():
             digit = all_bases[char]
             num += digit * (base ** counter)
             counter -= 1
-        total = max(total, num)
-    print(total)
+        total += num
+    current_base = 2
+    while True:
+        if current_base ** 4 > total:
+            break
+        current_base += 1
+    print(current_base)
         
 
 if __name__ == "__main__":
