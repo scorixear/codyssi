@@ -8,9 +8,9 @@ class Item():
         self.cost = cost
         self.mats = mats
     def __repr__(self):
-        return f"{self.name} ({self.quality})"
+        return f"{self.name} ({self.cost})"
     def __str__(self):
-        return f"{self.name} ({self.quality})"
+        return f"{self.name} ({self.cost})"
     def __hash__(self):
         return hash(self.name)
     def __eq__(self, other):
@@ -38,9 +38,33 @@ def main():
         cost = int(cost[:-1])
         mats = int(mats)
         items.append(Item(name, quality, cost, mats))
-    items.sort(reverse=True)
-    total = sum([i.mats for i in items[:5]])
-    print(f"Total: {total}")
+    dp = {}
+    q, _, m = best_weight(items, 0, 0, 0, 0, set(), dp)
+    print(q*m)
+
+def best_weight(items: list[Item], total_cost: int, index: int, total_quality: int, total_mats: int, visited: set[Item], dp: dict[tuple[int, int, int]]):
+    if (index, total_cost, total_quality) in dp:
+        return dp[(index, total_cost, total_quality)]
+    if total_cost > 30:
+        return -float("inf"), {}, float("inf")
+    if index == len(items) or total_cost == 30:
+        return total_quality, total_mats
+    item = items[index]
+    q1, m1 = best_weight(items, total_cost + item.cost, index + 1, total_quality + item.quality, total_mats + item.mats, visited | {item}, dp)
+    q2, m2 = best_weight(items, total_cost, index + 1, total_quality, total_mats, visited, dp)
+    if q1 > q2:
+        dp[(index, total_cost, total_quality)] = (q1, m1)
+        return q1, m1
+    elif q1 == q2:
+        if m1 > m2:
+            dp[(index, total_cost, total_quality)] = (q2, m2)
+            return q2, m2
+        else:
+            dp[((index, total_cost, total_quality))] = (q1, m1)
+            return q1, m1
+    else:
+        dp[(index, total_cost, total_quality)] = (q2, m2)
+        return q2, m2
     
 
 if __name__ == "__main__":
