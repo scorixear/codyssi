@@ -25,6 +25,12 @@ class Node:
                 child.parent = self
             else:
                 self.left.add_child(child)
+    def traverse(self, nodes: list["Node"]):
+        if self.parent is not None:
+            nodes.append(self.parent)
+            return self.parent.traverse(nodes)
+        return nodes
+
     def __repr__(self):
         return f"Node(code={self.code}, id={self.id})"
     def __str__(self):
@@ -64,26 +70,45 @@ def main():
     with open(os.path.join(sys.path[0],"input.txt"), "r", encoding="utf-8") as f:
         text = f.read().strip()
         lines = text.split("\n")
-    nodes = []
-    for line in lines:
-        if line == "":
-            break
-        code, id = line.split(" | ")
-        id = int(id)
-        node = Node(code, id)
-        nodes.append(node)
+    nodes = {}
     tree = Tree()
-    for node in nodes:
-        tree.insert_node(node)
-    layers = tree.get_layer_ids()
-    max_layer = 0
-    layer_count = 0
-    for layer in layers:
-        if layer > max_layer:
-            max_layer = layer
-        if layer > 0:
-            layer_count += 1
-    print(max_layer * layer_count)
+    mode = 0
+    path1 = None
+    path2 = None
+    for line in lines:
+        if mode == 0 and line == "":
+            mode = 1
+            continue
+        if mode == 0:
+            code, id = line.split(" | ")
+            id = int(id)
+            node = Node(code, id)
+            nodes[node.code] = node
+            tree.insert_node(node)
+        else:
+            code, id = line.split(" | ")
+            id = int(id)
+            node = nodes[code]
+            if path1 is None:
+                path1 = node.traverse([])
+                path1.reverse()
+            elif path2 is None:
+                path2 = node.traverse([])
+                path2.reverse()
+    index = 0
+    common = None
+    while True:
+        if index >= len(path1) or index >= len(path2):
+            break
+        if path1[index] == path2[index]:
+            common = path1[index]
+            index += 1
+        else:
+            break
+    if common is None:
+        print("No common ancestor found")
+        return
+    print(common)
 
 
     

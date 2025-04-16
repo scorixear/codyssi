@@ -25,6 +25,12 @@ class Node:
                 child.parent = self
             else:
                 self.left.add_child(child)
+    def traverse(self, nodes: list["Node"]):
+        if self.parent is not None:
+            nodes.append(self.parent)
+            return self.parent.traverse(nodes)
+        return nodes
+
     def __repr__(self):
         return f"Node(code={self.code}, id={self.id})"
     def __str__(self):
@@ -75,15 +81,11 @@ def main():
     tree = Tree()
     for node in nodes:
         tree.insert_node(node)
-    layers = tree.get_layer_ids()
-    max_layer = 0
-    layer_count = 0
-    for layer in layers:
-        if layer > max_layer:
-            max_layer = layer
-        if layer > 0:
-            layer_count += 1
-    print(max_layer * layer_count)
+    empty_node = Node("EMPTY", 500000)
+    tree.insert_node(empty_node)
+    route = empty_node.traverse([])
+    route.reverse()
+    print(str.join("-", [route[i].code for i in range(len(route))]))
 
 
     
